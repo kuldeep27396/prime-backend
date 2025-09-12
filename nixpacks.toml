@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["python311", "postgresql"]
+
+[phases.install]
+cmds = ["pip install --no-cache-dir -r requirements-minimal.txt"]
+
+[phases.build]
+cmds = ["echo 'Build phase complete'"]
+
+[start]
+cmd = "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
