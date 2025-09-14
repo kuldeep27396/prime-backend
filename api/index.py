@@ -1,22 +1,17 @@
 """
-Vercel serverless function entry point for PRIME API
+PRIME API - FastAPI Backend for Vercel
+Minimal setup for deployment, ready for future API additions
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 import os
-import sys
 
-# Add the parent directory to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Import minimal configuration and core components
-from app.core.config import settings
-
-# Create a lightweight FastAPI app for Vercel
+# Create FastAPI app
 app = FastAPI(
     title="PRIME API",
-    description="Predictive Recruitment & Interview Machine - Serverless API",
+    description="Predictive Recruitment & Interview Machine - Backend API",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -25,49 +20,48 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure this properly for production
+    allow_origins=["*"],  # Configure for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Import only essential routers that don't require heavy dependencies
-try:
-    from app.api.v1 import auth
-    app.include_router(auth.router, prefix="/api/v1/auth", tags=["authentication"])
-except ImportError:
-    pass
-
-try:
-    from app.api.v1 import jobs
-    app.include_router(jobs.router, prefix="/api/v1/jobs", tags=["jobs"])
-except ImportError:
-    pass
-
-try:
-    from app.api.v1 import candidates
-    app.include_router(candidates.router, prefix="/api/v1/candidates", tags=["candidates"])
-except ImportError:
-    pass
-
 @app.get("/")
 async def root():
-    """Root endpoint"""
+    """Root endpoint - API information"""
     return {
-        "message": "PRIME API - Serverless Version",
+        "name": "PRIME API",
+        "description": "Predictive Recruitment & Interview Machine",
         "version": "1.0.0",
         "status": "operational",
-        "platform": "Vercel"
+        "platform": "Vercel",
+        "timestamp": datetime.utcnow().isoformat()
     }
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     return {
-        "status": "healthy", 
+        "status": "healthy",
         "environment": os.getenv("ENVIRONMENT", "production"),
-        "platform": "vercel"
+        "platform": "vercel",
+        "timestamp": datetime.utcnow().isoformat()
     }
 
-# Export the app for Vercel
+@app.get("/api/v1/status")
+async def api_status():
+    """API status endpoint"""
+    return {
+        "api_version": "v1",
+        "status": "active",
+        "message": "API is ready for development",
+        "endpoints": {
+            "root": "/",
+            "health": "/health",
+            "docs": "/docs",
+            "redoc": "/redoc"
+        }
+    }
+
+# Vercel handler
 handler = app
