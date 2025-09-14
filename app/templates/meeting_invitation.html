@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .meeting-details {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .calendar-links {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Meeting Invitation: {{meeting_title}}</h2>
+
+    <p>You have been invited to a meeting.</p>
+
+    <div class="meeting-details">
+        <p><strong>Title:</strong> {{meeting_title}}</p>
+        <p><strong>Description:</strong> {{meeting_description}}</p>
+        <p><strong>Date:</strong> {{meeting_date}}</p>
+        <p><strong>Time:</strong> {{meeting_time}}</p>
+        <p><strong>Duration:</strong> {{meeting_duration}} minutes</p>
+
+        {% if meeting_link %}
+        <p><strong>Meeting Link:</strong> <a href="{{meeting_link}}">Join Meeting</a></p>
+        {% endif %}
+    </div>
+
+    <div>
+        <a href="{{meeting_link}}" class="button">Join Meeting</a>
+    </div>
+
+    <div class="calendar-links">
+        <p>Add to your calendar:</p>
+        <p>
+            <a href="{{google_calendar_link}}">Google Calendar</a> |
+            <a href="{{outlook_calendar_link}}">Outlook Calendar</a> |
+            <a href="{{ics_calendar_link}}">Download .ics</a>
+        </p>
+    </div>
+
+    <p>Please confirm your attendance by clicking one of the following:</p>
+    <p>
+        <a href="{{accept_url}}">Accept</a> |
+        <a href="{{tentative_url}}">Maybe</a> |
+        <a href="{{decline_url}}">Decline</a>
+    </p>
+
+    <p style="color: #666; font-size: 0.9em; margin-top: 30px;">
+        This is an automated message. Please do not reply directly to this email.
+    </p>
+</body>
+
+</html>
