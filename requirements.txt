@@ -4,3 +4,11 @@ python-dotenv
 aiosmtplib
 email-validator
 pydantic[email]
+sqlalchemy
+asyncpg
+alembic
+psycopg2-binary
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+httpx

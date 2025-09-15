@@ -268,3 +268,27 @@ async def send_email(email_request: EmailRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Unexpected error while sending email: {str(e)}"
         )
+
+@app.get("/api/debug/smtp-config", 
+         summary="Debug SMTP configuration",
+         description="Check SMTP configuration status (for debugging only)",
+         tags=["Debug"])
+def debug_smtp_config():
+    """
+    **Debug SMTP Configuration**
+    
+    Returns the current SMTP configuration status and loaded environment variables.
+    This endpoint helps debug email service configuration issues.
+    
+    **Note**: This is a debug endpoint and should be removed in production.
+    """
+    return {
+        "smtp_host": email_service.smtp_host,
+        "smtp_port": email_service.smtp_port,
+        "smtp_user": email_service.smtp_user,
+        "smtp_password": "***" if email_service.smtp_password else None,
+        "from_email": email_service.from_email,
+        "from_name": email_service.from_name,
+        "smtp_secure": email_service.smtp_secure,
+        "is_configured": email_service.is_configured()
+    }
