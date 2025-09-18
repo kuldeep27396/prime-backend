@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 # Import routers
-from app.routers import users, mentors, sessions
+from app.routers import users, mentors, sessions, rooms
 from app.schemas.common import ErrorResponse, ErrorCodes
 
 # Load environment variables
@@ -69,6 +69,7 @@ app.add_middleware(
 app.include_router(users.router)
 app.include_router(mentors.router)
 app.include_router(sessions.router)
+app.include_router(rooms.router)
 
 # Error handlers
 @app.exception_handler(RequestValidationError)
