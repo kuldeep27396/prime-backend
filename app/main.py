@@ -165,7 +165,7 @@ def health_check():
 def debug_email_config():
     """Debug email configuration endpoint"""
     return {
-        "resend_api_key": "***" if os.getenv("RESEND_API_KEY") else None,
+        "brevo_api_key": "***" if os.getenv("BREVO_API_KEY") else None,
         "from_email": os.getenv("SMTP_FROM_EMAIL"),
         "from_name": os.getenv("SMTP_FROM_NAME"),
         **email_service.get_configuration_status()
@@ -198,17 +198,17 @@ class EmailResponse(BaseModel):
 @app.post("/api/send-email",
           response_model=EmailResponse,
           status_code=status.HTTP_200_OK,
-          summary="Send email via SMTP",
-          description="Send transactional emails using the configured SMTP service",
+          summary="Send email via Brevo API",
+          description="Send transactional emails using the configured Brevo API service",
           tags=["Email"])
 async def send_email(email_request: EmailRequest):
-    """Send email via SMTP"""
+    """Send email via Brevo API"""
     try:
         # Check if email service is configured
         if not email_service.is_configured():
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Email service is not properly configured. Please check SMTP environment variables."
+                detail="Email service is not properly configured. Please check Brevo API environment variables."
             )
 
         # Send the email
@@ -227,7 +227,7 @@ async def send_email(email_request: EmailRequest):
         else:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to send email. Please check SMTP configuration and try again."
+                detail="Failed to send email. Please check Brevo API configuration and try again."
             )
 
     except HTTPException:

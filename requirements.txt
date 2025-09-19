@@ -11,3 +11,4 @@ python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
 httpx
+sib-api-v3-sdk
