@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 # Import routers
 from app.routers import users, mentors, sessions, rooms
+from app.routers import users_extended, mentors_extended, content, analytics, integrations, video
 from app.schemas.common import ErrorResponse, ErrorCodes
 
 # Load environment variables
@@ -70,6 +71,12 @@ app.include_router(users.router)
 app.include_router(mentors.router)
 app.include_router(sessions.router)
 app.include_router(rooms.router)
+app.include_router(users_extended.router)
+app.include_router(mentors_extended.router)
+app.include_router(content.router)
+app.include_router(analytics.router)
+app.include_router(integrations.router)
+app.include_router(video.router)
 
 # Error handlers
 @app.exception_handler(RequestValidationError)
@@ -150,6 +157,28 @@ def health_check():
         "database": "connected",
         "email_service": "configured" if os.getenv("SMTP_HOST") else "not_configured"
     }
+
+@app.get("/api/debug/email-config",
+         summary="Debug email configuration",
+         description="Returns current email configuration status",
+         tags=["Debug"])
+def debug_email_config():
+    """Debug email configuration endpoint"""
+    return {
+        "resend_api_key": "***" if os.getenv("RESEND_API_KEY") else None,
+        "from_email": os.getenv("SMTP_FROM_EMAIL"),
+        "from_name": os.getenv("SMTP_FROM_NAME"),
+        **email_service.get_configuration_status()
+    }
+
+# Keep the old endpoint for backward compatibility
+@app.get("/api/debug/smtp-config",
+         summary="Debug email configuration (legacy)",
+         description="Returns current email configuration status",
+         tags=["Debug"])
+def debug_smtp_config():
+    """Debug email configuration endpoint"""
+    return debug_email_config()
 
 # Keep the original email endpoint from the existing API
 from app.email_service import email_service

@@ -1,7 +1,6 @@
 fastapi
 uvicorn[standard]
 python-dotenv
-aiosmtplib
 email-validator
 pydantic[email]
 sqlalchemy

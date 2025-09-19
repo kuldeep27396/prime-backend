@@ -788,4 +788,789 @@ Response: {
 6. **Backup**: Regular database backups and session recording backup strategy
 7. **Testing**: Comprehensive API tests including authentication, validation, and integration tests
 
-This documentation provides the complete specification for implementing the backend APIs needed to support the Prime Interviews frontend application.
+### 7. AI Interview Practice APIs
+
+#### POST /api/ai-interviews
+**Description**: Start AI-powered mock interview session
+
+**Authentication**: Required
+
+**Request Body**:
+```json
+{
+  "interviewType": "string",      // "technical", "behavioral", "system_design"
+  "difficulty": "string",         // "beginner", "intermediate", "advanced"
+  "skills": ["string"],           // Focus areas
+  "duration": "number",           // Duration in minutes
+  "recordSession": "boolean"
+}
+```
+
+**Response**:
+```json
+{
+  "sessionId": "string",
+  "questions": [
+    {
+      "id": "string",
+      "type": "string",             // "coding", "behavioral", "system_design"
+      "question": "string",
+      "difficulty": "string",
+      "timeLimit": "number",        // Time limit in minutes
+      "hints": ["string"],          // Available hints
+      "resources": ["string"]       // Reference materials
+    }
+  ],
+  "aiPersonality": {
+    "name": "string",
+    "role": "string",               // "Senior Engineer", "Tech Lead"
+    "company": "string"
+  }
+}
+```
+
+#### POST /api/ai-interviews/:sessionId/submit
+**Description**: Submit answer to AI interview question
+
+**Request Body**:
+```json
+{
+  "questionId": "string",
+  "answer": "string",
+  "code": "string",               // For coding questions
+  "timeSpent": "number",          // Time spent in seconds
+  "hintsUsed": ["string"]
+}
+```
+
+**Response**:
+```json
+{
+  "feedback": {
+    "score": "number",            // 0-100
+    "strengths": ["string"],
+    "improvements": ["string"],
+    "detailedFeedback": "string",
+    "codeReview": {               // For coding questions
+      "correctness": "number",
+      "efficiency": "number",
+      "codeQuality": "number",
+      "suggestions": ["string"]
+    }
+  },
+  "nextQuestion": "object",       // Next question or null if finished
+  "overallProgress": {
+    "questionsCompleted": "number",
+    "totalQuestions": "number",
+    "averageScore": "number"
+  }
+}
+```
+
+#### GET /api/ai-interviews/:sessionId/results
+**Description**: Get final AI interview results and analysis
+
+**Response**:
+```json
+{
+  "sessionId": "string",
+  "overallScore": "number",
+  "duration": "number",
+  "questionsAnswered": "number",
+  "breakdown": {
+    "technical": "number",
+    "problemSolving": "number",
+    "communication": "number",
+    "codeQuality": "number"
+  },
+  "detailedFeedback": "string",
+  "recommendations": [
+    {
+      "area": "string",
+      "priority": "string",        // "high", "medium", "low"
+      "resources": ["string"],
+      "nextSteps": ["string"]
+    }
+  ],
+  "certificateUrl": "string",     // If applicable
+  "transcript": "string"          // Full session transcript
+}
+```
+
+### 8. Company Screening APIs
+
+#### POST /api/company/screening
+**Description**: Create screening interview for candidates
+
+**Authentication**: Required (Company role)
+
+**Request Body**:
+```json
+{
+  "jobTitle": "string",
+  "jobDescription": "string",
+  "requiredSkills": ["string"],
+  "experienceLevel": "string",    // "junior", "mid", "senior"
+  "interviewType": "string",      // "technical", "behavioral", "mixed"
+  "duration": "number",
+  "candidateEmails": ["string"],
+  "deadline": "ISO8601",
+  "customQuestions": [
+    {
+      "question": "string",
+      "type": "string",           // "multiple_choice", "coding", "text"
+      "options": ["string"],      // For multiple choice
+      "expectedAnswer": "string"
+    }
+  ]
+}
+```
+
+**Response**:
+```json
+{
+  "screeningId": "string",
+  "invitationLinks": [
+    {
+      "email": "string",
+      "uniqueLink": "string",
+      "expiresAt": "ISO8601"
+    }
+  ],
+  "emailsSent": "number",
+  "status": "string"             // "active", "draft", "closed"
+}
+```
+
+#### GET /api/company/screening/:screeningId/candidates
+**Description**: Get candidates who completed screening
+
+**Response**:
+```json
+{
+  "screening": {
+    "id": "string",
+    "jobTitle": "string",
+    "totalCandidates": "number",
+    "completedCandidates": "number",
+    "averageScore": "number"
+  },
+  "candidates": [
+    {
+      "id": "string",
+      "email": "string",
+      "name": "string",
+      "completedAt": "ISO8601",
+      "overallScore": "number",
+      "timeSpent": "number",
+      "skills": {
+        "technical": "number",
+        "communication": "number",
+        "problemSolving": "number"
+      },
+      "responses": [
+        {
+          "questionId": "string",
+          "answer": "string",
+          "score": "number",
+          "timeSpent": "number"
+        }
+      ],
+      "recommendation": "string",  // "hire", "maybe", "pass"
+      "aiAnalysis": "string"
+    }
+  ]
+}
+```
+
+### 9. Blog & Content APIs
+
+#### GET /api/blog/posts
+**Description**: Get paginated blog posts
+
+**Query Parameters**:
+```
+?page=1
+&limit=10
+&category=technical
+&author=diana-prince
+&search=interview+tips
+&featured=true
+```
+
+**Response**:
+```json
+{
+  "posts": [
+    {
+      "id": "string",
+      "title": "string",
+      "slug": "string",
+      "excerpt": "string",
+      "content": "string",          // Markdown content
+      "author": {
+        "name": "string",
+        "avatar": "string",
+        "bio": "string"
+      },
+      "category": "string",
+      "tags": ["string"],
+      "featuredImage": "string",
+      "publishedAt": "ISO8601",
+      "readTime": "number",          // Estimated read time in minutes
+      "featured": "boolean",
+      "viewCount": "number"
+    }
+  ],
+  "pagination": {
+    "page": "number",
+    "limit": "number",
+    "total": "number",
+    "totalPages": "number"
+  },
+  "categories": ["string"],
+  "popularTags": ["string"]
+}
+```
+
+#### GET /api/blog/posts/:slug
+**Description**: Get single blog post by slug
+
+**Response**:
+```json
+{
+  "post": {
+    "id": "string",
+    "title": "string",
+    "content": "string",          // Full markdown content
+    "author": {
+      "name": "string",
+      "avatar": "string",
+      "bio": "string",
+      "socialLinks": {
+        "twitter": "string",
+        "linkedin": "string"
+      }
+    },
+    "category": "string",
+    "tags": ["string"],
+    "featuredImage": "string",
+    "publishedAt": "ISO8601",
+    "updatedAt": "ISO8601",
+    "readTime": "number",
+    "viewCount": "number",
+    "featured": "boolean"
+  },
+  "relatedPosts": [
+    {
+      "id": "string",
+      "title": "string",
+      "slug": "string",
+      "excerpt": "string",
+      "featuredImage": "string",
+      "publishedAt": "ISO8601"
+    }
+  ]
+}
+```
+
+#### POST /api/newsletter/subscribe
+**Description**: Subscribe to newsletter
+
+**Request Body**:
+```json
+{
+  "email": "string",
+  "name": "string",
+  "preferences": {
+    "weeklyDigest": "boolean",
+    "interviewTips": "boolean",
+    "productUpdates": "boolean"
+  }
+}
+```
+
+### 10. Help Center & Documentation APIs
+
+#### GET /api/help/articles
+**Description**: Get help center articles
+
+**Query Parameters**:
+```
+?category=getting-started
+&search=billing
+&limit=20
+```
+
+**Response**:
+```json
+{
+  "articles": [
+    {
+      "id": "string",
+      "title": "string",
+      "slug": "string",
+      "content": "string",        // Markdown content
+      "category": "string",
+      "subcategory": "string",
+      "tags": ["string"],
+      "lastUpdated": "ISO8601",
+      "helpful": "number",       // Helpful votes
+      "views": "number"
+    }
+  ],
+  "categories": [
+    {
+      "name": "string",
+      "slug": "string",
+      "articleCount": "number",
+      "subcategories": ["string"]
+    }
+  ]
+}
+```
+
+#### POST /api/support/tickets
+**Description**: Create support ticket
+
+**Authentication**: Optional
+
+**Request Body**:
+```json
+{
+  "name": "string",
+  "email": "string",
+  "subject": "string",
+  "message": "string",
+  "priority": "string",        // "low", "medium", "high", "urgent"
+  "category": "string",        // "technical", "billing", "feature_request"
+  "attachments": ["string"]    // File URLs
+}
+```
+
+### 11. Analytics & Reporting APIs
+
+#### GET /api/admin/analytics/overview
+**Description**: Get platform analytics overview (Admin only)
+
+**Authentication**: Required (Admin role)
+
+**Response**:
+```json
+{
+  "metrics": {
+    "totalUsers": "number",
+    "activeUsers": "number",       // Last 30 days
+    "totalMentors": "number",
+    "totalSessions": "number",
+    "revenueThisMonth": "number",
+    "averageSessionRating": "number"
+  },
+  "growth": {
+    "userGrowth": "number",        // % change from last month
+    "sessionGrowth": "number",
+    "revenueGrowth": "number"
+  },
+  "topMetrics": {
+    "popularSkills": [
+      {
+        "skill": "string",
+        "sessions": "number"
+      }
+    ],
+    "topMentors": [
+      {
+        "mentorId": "string",
+        "name": "string",
+        "sessions": "number",
+        "rating": "number"
+      }
+    ],
+    "activeRegions": [
+      {
+        "country": "string",
+        "users": "number"
+      }
+    ]
+  }
+}
+```
+
+### 12. Mobile App APIs
+
+#### GET /api/mobile/config
+**Description**: Get mobile app configuration
+
+**Response**:
+```json
+{
+  "appVersion": "string",
+  "minSupportedVersion": "string",
+  "features": {
+    "offlinePractice": "boolean",
+    "pushNotifications": "boolean",
+    "voiceToText": "boolean",
+    "biometricAuth": "boolean"
+  },
+  "endpoints": {
+    "apiUrl": "string",
+    "websocketUrl": "string",
+    "supportUrl": "string"
+  },
+  "updateRequired": "boolean",
+  "updateUrl": "string"
+}
+```
+
+#### POST /api/mobile/sync
+**Description**: Sync offline practice data
+
+**Authentication**: Required
+
+**Request Body**:
+```json
+{
+  "offlineActivities": [
+    {
+      "type": "string",           // "ai_practice", "skill_assessment"
+      "data": "object",
+      "completedAt": "ISO8601",
+      "duration": "number"
+    }
+  ],
+  "lastSyncAt": "ISO8601"
+}
+```
+
+### 13. Notification APIs
+
+#### GET /api/notifications
+**Description**: Get user notifications
+
+**Authentication**: Required
+
+**Response**:
+```json
+{
+  "notifications": [
+    {
+      "id": "string",
+      "type": "string",           // "session_reminder", "new_message", "system_update"
+      "title": "string",
+      "message": "string",
+      "data": "object",           // Additional notification data
+      "read": "boolean",
+      "createdAt": "ISO8601",
+      "actionUrl": "string"       // Optional action URL
+    }
+  ],
+  "unreadCount": "number"
+}
+```
+
+#### PATCH /api/notifications/:notificationId/read
+**Description**: Mark notification as read
+
+#### POST /api/notifications/preferences
+**Description**: Update notification preferences
+
+**Request Body**:
+```json
+{
+  "email": {
+    "sessionReminders": "boolean",
+    "weeklyDigest": "boolean",
+    "promotions": "boolean"
+  },
+  "push": {
+    "sessionReminders": "boolean",
+    "messages": "boolean",
+    "updates": "boolean"
+  },
+  "sms": {
+    "urgentReminders": "boolean"
+  }
+}
+```
+
+### 14. File Upload APIs
+
+#### POST /api/upload/avatar
+**Description**: Upload user profile avatar
+
+**Authentication**: Required
+
+**Request**: Multipart form data with file
+
+**Response**:
+```json
+{
+  "url": "string",              // CDN URL of uploaded image
+  "thumbnails": {
+    "small": "string",          // 50x50
+    "medium": "string",         // 150x150
+    "large": "string"           // 300x300
+  }
+}
+```
+
+#### POST /api/upload/resume
+**Description**: Upload resume for AI analysis
+
+**Response**:
+```json
+{
+  "url": "string",
+  "analysis": {
+    "skills": ["string"],
+    "experience": "string",
+    "suggestedInterviews": ["string"],
+    "strengthAreas": ["string"],
+    "improvementAreas": ["string"]
+  }
+}
+```
+
+### 15. Search & Recommendations APIs
+
+#### GET /api/search
+**Description**: Global search across mentors, content, and help articles
+
+**Query Parameters**:
+```
+?q=system+design
+&type=mentors,posts,help
+&filters[skills]=React,JavaScript
+```
+
+**Response**:
+```json
+{
+  "results": {
+    "mentors": [
+      {
+        "id": "string",
+        "name": "string",
+        "title": "string",
+        "company": "string",
+        "avatar": "string",
+        "rating": "number",
+        "relevanceScore": "number"
+      }
+    ],
+    "posts": [
+      {
+        "id": "string",
+        "title": "string",
+        "excerpt": "string",
+        "author": "string",
+        "publishedAt": "ISO8601",
+        "relevanceScore": "number"
+      }
+    ],
+    "helpArticles": [
+      {
+        "id": "string",
+        "title": "string",
+        "category": "string",
+        "relevanceScore": "number"
+      }
+    ]
+  },
+  "total": "number",
+  "suggestions": ["string"]    // Search suggestions
+}
+```
+
+#### GET /api/recommendations/:userId
+**Description**: Get personalized recommendations
+
+**Response**:
+```json
+{
+  "mentors": [
+    {
+      "mentor": "object",       // Mentor object
+      "reason": "string",       // Why recommended
+      "score": "number"
+    }
+  ],
+  "skills": [
+    {
+      "skill": "string",
+      "priority": "number",     // 1-10
+      "resources": ["string"]
+    }
+  ],
+  "content": [
+    {
+      "type": "string",         // "blog", "tutorial", "course"
+      "item": "object",
+      "reason": "string"
+    }
+  ]
+}
+```
+
+---
+
+## Additional Database Tables
+
+### Blog Posts Table
+```sql
+CREATE TABLE blog_posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(500) NOT NULL,
+  slug VARCHAR(500) UNIQUE NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  author_id UUID REFERENCES users(id),
+  category VARCHAR(100),
+  tags JSONB,
+  featured_image TEXT,
+  published_at TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  featured BOOLEAN DEFAULT false,
+  view_count INTEGER DEFAULT 0,
+  status VARCHAR(50) DEFAULT 'draft'    -- draft, published, archived
+);
+```
+
+### Support Tickets Table
+```sql
+CREATE TABLE support_tickets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id),
+  name VARCHAR(255),
+  email VARCHAR(255),
+  subject VARCHAR(500) NOT NULL,
+  message TEXT NOT NULL,
+  priority VARCHAR(50) DEFAULT 'medium',
+  category VARCHAR(100),
+  status VARCHAR(50) DEFAULT 'open',    -- open, in_progress, resolved, closed
+  assigned_to UUID REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  resolved_at TIMESTAMP
+);
+```
+
+### Notifications Table
+```sql
+CREATE TABLE notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id),
+  type VARCHAR(100) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  message TEXT,
+  data JSONB,
+  read BOOLEAN DEFAULT false,
+  action_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Newsletter Subscriptions Table
+```sql
+CREATE TABLE newsletter_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255),
+  preferences JSONB,
+  subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  unsubscribed_at TIMESTAMP,
+  status VARCHAR(50) DEFAULT 'active'   -- active, unsubscribed, bounced
+);
+```
+
+### Company Screenings Table
+```sql
+CREATE TABLE company_screenings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID REFERENCES users(id),
+  job_title VARCHAR(255) NOT NULL,
+  job_description TEXT,
+  required_skills JSONB,
+  experience_level VARCHAR(100),
+  interview_type VARCHAR(100),
+  duration INTEGER,
+  custom_questions JSONB,
+  deadline TIMESTAMP,
+  status VARCHAR(50) DEFAULT 'active',  -- active, draft, closed
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Screening Responses Table
+```sql
+CREATE TABLE screening_responses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  screening_id UUID REFERENCES company_screenings(id),
+  candidate_email VARCHAR(255),
+  candidate_name VARCHAR(255),
+  responses JSONB,
+  overall_score DECIMAL(5,2),
+  time_spent INTEGER,              -- Time spent in minutes
+  completed_at TIMESTAMP,
+  ai_analysis TEXT,
+  recommendation VARCHAR(50)       -- hire, maybe, pass
+);
+```
+
+### AI Interview Sessions Table
+```sql
+CREATE TABLE ai_interview_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id),
+  interview_type VARCHAR(100),
+  difficulty VARCHAR(50),
+  skills JSONB,
+  duration INTEGER,
+  questions JSONB,
+  responses JSONB,
+  overall_score DECIMAL(5,2),
+  detailed_feedback TEXT,
+  recommendations JSONB,
+  started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  completed_at TIMESTAMP,
+  status VARCHAR(50) DEFAULT 'in_progress'  -- in_progress, completed, abandoned
+);
+```
+
+---
+
+## WebSocket Events
+
+### Real-time Features
+```javascript
+// Session status updates
+'session:status_changed': {
+  sessionId: 'string',
+  status: 'string',
+  participants: ['string']
+}
+
+// New notifications
+'notification:new': {
+  id: 'string',
+  type: 'string',
+  title: 'string',
+  message: 'string'
+}
+
+// AI interview feedback
+'ai_interview:question_feedback': {
+  sessionId: 'string',
+  questionId: 'string',
+  feedback: 'object'
+}
+
+// Mentor availability updates
+'mentor:availability_changed': {
+  mentorId: 'string',
+  availability: ['string']
+}
+```
+
+---
+
+This comprehensive documentation now covers all the APIs needed to support the complete Prime Interviews platform, including the new pages, AI features, company screening, blog functionality, mobile app support, and administrative features.
