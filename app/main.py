@@ -8,8 +8,9 @@ import os
 from dotenv import load_dotenv
 
 # Import routers
-from app.routers import users, mentors, sessions, rooms
-from app.routers import users_extended, mentors_extended, content, analytics, integrations, video
+from app.routers import users, sessions
+from app.routers import users_extended, content, analytics, integrations
+from app.routers import companies, jobs, candidates, ai_interviews
 from app.schemas.common import ErrorResponse, ErrorCodes
 
 # Load environment variables
@@ -18,16 +19,16 @@ load_dotenv()
 app = FastAPI(
     title="Prime Interviews API",
     description="""
-    **Prime Interviews API** - A comprehensive backend service for interview scheduling and management.
+    **Prime Interviews API** - AI-powered interview platform for B2B candidate screening and mock practice.
 
     ## Features
 
-    * **User Management**: Create and manage user profiles with Clerk authentication
-    * **Mentor Discovery**: Search and filter mentors by skills, experience, and availability
-    * **Session Booking**: Schedule, manage, and track interview sessions
-    * **Video Integration**: Create and manage video call rooms for remote interviews
+    * **B2B Screening**: Companies onboard, post jobs, receive applications, AI screens candidates
+    * **AI Interviews**: Automated video/audio interviews with AI that asks recruiter-style questions
+    * **Shortlisting**: AI-powered candidate ranking with detailed reasoning
+    * **Mock Practice**: AI interview practice for IT/software professionals
     * **Analytics**: Comprehensive dashboard analytics and progress tracking
-    * **Email Notifications**: Automated email notifications for bookings and updates
+    * **Email Notifications**: Automated notifications for interviews and results
 
     ## Authentication
 
@@ -36,14 +37,15 @@ app = FastAPI(
     Authorization: Bearer <your_clerk_jwt_token>
     ```
 
-    ## Rate Limiting
+    ## Pricing Tiers
 
-    API endpoints are rate limited to ensure fair usage:
-    - General API: 100 requests per minute
-    - Email API: 10 requests per minute
-    - Search API: 30 requests per minute
+    - **Free**: 2 AI interviews
+    - **Starter (1-100)**: Flat monthly price
+    - **Growth (100-1000)**: Flat monthly price
+    - **Enterprise (1000+)**: Custom pricing
+    - **Pay-per-interview**: Per interview cost option
     """,
-    version="2.0.0",
+    version="3.0.0",
     contact={
         "name": "Prime Interviews Team",
         "email": "support@prime-interviews.com",
@@ -66,17 +68,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
+# Include routers - Core
 app.include_router(users.router)
-app.include_router(mentors.router)
-app.include_router(sessions.router)
-app.include_router(rooms.router)
 app.include_router(users_extended.router)
-app.include_router(mentors_extended.router)
+app.include_router(sessions.router)
 app.include_router(content.router)
 app.include_router(analytics.router)
 app.include_router(integrations.router)
-app.include_router(video.router)
+
+# Include routers - B2B Company Management
+app.include_router(companies.router)
+app.include_router(jobs.router)
+app.include_router(candidates.router)
+
+# Include routers - AI Interviews
+app.include_router(ai_interviews.router)
 
 # Error handlers
 @app.exception_handler(RequestValidationError)
